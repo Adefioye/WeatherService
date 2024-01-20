@@ -22,7 +22,6 @@ public class LocationController {
 
     @PostMapping
     public ResponseEntity<Location> addLocation(@RequestBody @Valid Location locationRequest) {
-        System.out.println("Entering a controller: " + locationRequest);
         Location savedLocation = locationService.addLocation(locationRequest);
 
         String locationUri = ServletUriComponentsBuilder
