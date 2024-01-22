@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
@@ -22,14 +21,10 @@ public class LocationController {
 
     @PostMapping
     public ResponseEntity<Location> addLocation(@RequestBody @Valid Location locationRequest) {
-        Location savedLocation = locationService.addLocation(locationRequest);
+        Location newLocation = locationService.addLocation(locationRequest);
 
-        String locationUri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{code}")
-                .buildAndExpand(savedLocation.getCode())
-                .toUriString();
+        URI uriLocation = URI.create("/api/v1/locations/%s".formatted(newLocation.getCode()));
 
-        return ResponseEntity.created(URI.create(locationUri)).body(savedLocation);
+        return ResponseEntity.created(uriLocation).body(newLocation);
     }
 }
