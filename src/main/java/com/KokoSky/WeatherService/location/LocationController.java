@@ -1,11 +1,9 @@
 package com.KokoSky.WeatherService.location;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -26,5 +24,15 @@ public class LocationController {
         URI uriLocation = URI.create("/api/v1/locations/%s".formatted(newLocation.getCode()));
 
         return ResponseEntity.created(uriLocation).body(newLocation);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Location>> getLocations() {
+        List<Location> locations = locationService.getLocations();
+
+        if (locations.size() == 0) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok().body(locations);
     }
 }

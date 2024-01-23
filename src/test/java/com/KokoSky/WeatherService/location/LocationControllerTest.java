@@ -9,8 +9,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 
+import java.util.Collections;
+import java.util.List;
+
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -75,6 +81,46 @@ public class LocationControllerTest {
                 .andExpect(status().isBadRequest())
                 .andDo(print());
 
+    }
+
+    @Test
+    public void whenGetLocations_andNoLocations_returnEmptyLocationWithStatusCode204() throws Exception {
+
+        String ENDPOINT_URI = "/api/v1/locations";
+        when(locationService.getLocations()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get(ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    public void whenGetLocations_returnLocationsWithStatusCode200() throws Exception {
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
+        String ENDPOINT_URI = "/api/v1/locations";
+        when(locationService.getLocations()).thenReturn(List.of(location));
+
+        mockMvc.perform(get(ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andDo(print());
     }
 
 }

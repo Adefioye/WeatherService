@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -53,6 +55,7 @@ public class LocationServiceTest {
         // When
         Location newLocation = underTest.addLocation(location);
 
+        // Then
         assertThat(newLocation).isNotNull();
     }
 
@@ -84,8 +87,41 @@ public class LocationServiceTest {
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessage("Sorry! location code %s already exist!".formatted(code));
 
+        // Then
         verify(locationRepository, times(1)).existsLocationByCode(code);
         verify(locationRepository, never()).save(any(Location.class));
+
+    }
+
+    @Test
+    public void whenGetLocations_returnLocations() {
+        // Given
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
+        when(locationRepository.findAllUntrashedLocations()).thenReturn(List.of(location));
+
+        // When
+        List<Location> locations = underTest.getLocations();
+
+        // Then
+        assertThat(locations.size()).isGreaterThan(0);
+        verify(locationRepository, times(1)).findAllUntrashedLocations();
+
 
     }
 }

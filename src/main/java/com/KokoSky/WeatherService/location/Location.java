@@ -30,8 +30,9 @@ public class Location {
     @JsonProperty("city_name")
     private String cityName;
 
-    @Column(length = 128)
+    @Column(length = 128, nullable = false)
     @JsonProperty("region_name")
+    @NotNull
     private String regionName;
 
     @Column(length = 64, nullable = false)

@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -73,5 +75,65 @@ public class LocationRepositoryTest {
         boolean isLocationPresent = locationRepository.existsLocationByCode(nonExistentLocationCode);
 
         assertThat(isLocationPresent).isFalse();
+    }
+
+    @Test
+    public void whenGivenLocation_andTrashedIsTrue_returnEmptyList() {
+        // When
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = true;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        // When
+        locationRepository.save(location);
+        List<Location> allUntrashedLocations = locationRepository.findAllUntrashedLocations();
+
+        // Then
+        assertThat(allUntrashedLocations.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void whenGivenLocation_andTrashedIsFalse_returnLocation() {
+        // When
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = false;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        // When
+        locationRepository.save(location);
+        List<Location> allUntrashedLocations = locationRepository.findAllUntrashedLocations();
+
+        // Then
+        assertThat(allUntrashedLocations.size()).isEqualTo(1);
     }
 }
