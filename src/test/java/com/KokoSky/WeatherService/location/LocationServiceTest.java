@@ -1,6 +1,7 @@
 package com.KokoSky.WeatherService.location;
 
 import com.KokoSky.WeatherService.exceptions.DuplicateResourceException;
+import com.KokoSky.WeatherService.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,7 +62,7 @@ public class LocationServiceTest {
     }
 
     @Test
-    public void whenLocationExists_throwDuplicateResourceException() {
+    public void whenAddingLocation_andLocationExists_throwDuplicateResourceException() {
 
         // Given
         String code = "LACA_US";
@@ -90,7 +92,6 @@ public class LocationServiceTest {
         // Then
         verify(locationRepository, times(1)).existsLocationByCode(code);
         verify(locationRepository, never()).save(any(Location.class));
-
     }
 
     @Test
@@ -121,7 +122,49 @@ public class LocationServiceTest {
         // Then
         assertThat(locations.size()).isGreaterThan(0);
         verify(locationRepository, times(1)).findAllUntrashedLocations();
-
-
     }
+
+    @Test
+    public void whenGetLocationByCode_andLocationCodePresent_returnLocation() {
+        // Given
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
+        when(locationRepository.findUntrashedLocationsByCode(code)).thenReturn(Optional.of(location));
+
+        // When
+        Location locationByCode = underTest.getLocationByCode(code);
+
+        // Then
+        assertThat(locationByCode).isNotNull();
+        verify(locationRepository, times(1)).findUntrashedLocationsByCode(code);
+    }
+
+    @Test
+    public void whenGetLocationByCode_andLocationCodeAbsent_throwResourceNotFoundException() {
+        // Given
+        String code = "LACA_US";
+
+        when(locationRepository.findUntrashedLocationsByCode(code)).thenReturn(Optional.empty());
+
+        // When and Then
+        assertThatThrownBy(() -> underTest.getLocationByCode(code))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
+    }
+
 }
