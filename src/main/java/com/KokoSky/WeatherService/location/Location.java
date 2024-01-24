@@ -50,5 +50,5 @@ public class Location {
 
     @NotNull
     @JsonIgnore
-    private boolean trashed = true;
+    private boolean trashed = false;
 }

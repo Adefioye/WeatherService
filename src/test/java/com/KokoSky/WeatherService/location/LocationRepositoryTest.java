@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,11 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LocationRepositoryTest {
 
     @Autowired
-    private LocationRepository locationRepository;
+    private LocationRepository underTest;
 
     @BeforeEach
     void setUp() {
-        locationRepository.deleteAll();
+        underTest.deleteAll();
     }
 
     @Test
@@ -45,8 +46,8 @@ public class LocationRepositoryTest {
                 .enabled(enabled)
                 .build();
 
-        locationRepository.save(location);
-        boolean isLocationPresent = locationRepository.existsLocationByCode(location.getCode());
+        underTest.save(location);
+        boolean isLocationPresent = underTest.existsLocationByCode(location.getCode());
 
         assertThat(isLocationPresent).isTrue();
     }
@@ -71,8 +72,8 @@ public class LocationRepositoryTest {
                 .enabled(enabled)
                 .build();
 
-        locationRepository.save(location);
-        boolean isLocationPresent = locationRepository.existsLocationByCode(nonExistentLocationCode);
+        underTest.save(location);
+        boolean isLocationPresent = underTest.existsLocationByCode(nonExistentLocationCode);
 
         assertThat(isLocationPresent).isFalse();
     }
@@ -100,8 +101,8 @@ public class LocationRepositoryTest {
                 .build();
 
         // When
-        locationRepository.save(location);
-        List<Location> allUntrashedLocations = locationRepository.findAllUntrashedLocations();
+        underTest.save(location);
+        List<Location> allUntrashedLocations = underTest.findAllUntrashedLocations();
 
         // Then
         assertThat(allUntrashedLocations.size()).isEqualTo(0);
@@ -130,10 +131,52 @@ public class LocationRepositoryTest {
                 .build();
 
         // When
-        locationRepository.save(location);
-        List<Location> allUntrashedLocations = locationRepository.findAllUntrashedLocations();
+        underTest.save(location);
+        List<Location> allUntrashedLocations = underTest.findAllUntrashedLocations();
 
         // Then
         assertThat(allUntrashedLocations.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void whenGivenLocationCode_andPresent_returnLocation() {
+        // When
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = false;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        // When
+        underTest.save(location);
+        Optional<Location> locationByCode = underTest.findUntrashedLocationsByCode(code);
+
+        // Then
+        assertThat(locationByCode).isPresent();
+    }
+
+    @Test
+    public void whenGivenLocationCode_andAbsent_returnNull() {
+        // When
+        String nonExistentLocationCode = "LACA_US";
+
+        // When
+        Optional<Location> locationByCode = underTest.findUntrashedLocationsByCode(nonExistentLocationCode);
+
+        // Then
+        assertThat(locationByCode).isNotPresent();
     }
 }

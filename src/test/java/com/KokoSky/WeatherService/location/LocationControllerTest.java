@@ -1,5 +1,6 @@
 package com.KokoSky.WeatherService.location;
 
+import com.KokoSky.WeatherService.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,4 +124,45 @@ public class LocationControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    public void whenGetLocationByCode_andNoLocation_returnNotFoundWithStatusCode404() throws Exception {
+        String nonExistentLocationCode = "LACA_US";
+        String ENDPOINT_URI = "/api/v1/locations/%s";
+        when(locationService.getLocationByCode(nonExistentLocationCode)).thenThrow(ResourceNotFoundException.class);
+
+        mockMvc.perform(get(ENDPOINT_URI.formatted(nonExistentLocationCode)))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void whenGetLocationByCode_andLocationExists_returnLocationWithStatusCode200() throws Exception {
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
+        String ENDPOINT_URI = "/api/v1/locations/%s";
+        when(locationService.getLocationByCode(code)).thenReturn(location);
+
+        mockMvc.perform(get(ENDPOINT_URI.formatted(code)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(location.getCode()))
+                .andExpect(jsonPath("$.city_name").value(location.getCityName()))
+                .andExpect(jsonPath("$.region_name").value(location.getRegionName()))
+                .andExpect(jsonPath("$.country_name").value(location.getCountryName()))
+                .andExpect(jsonPath("$.country_code").value(location.getCountryCode()))
+                .andDo(print());
+    }
 }

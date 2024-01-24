@@ -2,7 +2,9 @@ package com.KokoSky.WeatherService.location;
 
 
 import com.KokoSky.WeatherService.exceptions.DuplicateResourceException;
+import com.KokoSky.WeatherService.exceptions.ResourceNotFoundException;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,5 +25,10 @@ public class LocationService {
 
     public List<Location> getLocations() {
         return locationRepository.findAllUntrashedLocations();
+    }
+
+    public Location getLocationByCode(String code) {
+        return locationRepository.findUntrashedLocationsByCode(code)
+                .orElseThrow(() -> new ResourceNotFoundException("Sorry! cannot find location with code: %s".formatted(code)));
     }
 }

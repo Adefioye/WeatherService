@@ -35,4 +35,11 @@ public class LocationController {
         }
         return ResponseEntity.ok().body(locations);
     }
+
+    @GetMapping("{code}")
+    public ResponseEntity<Location> getLocations(@PathVariable String code) {
+
+        Location locationByCode = locationService.getLocationByCode(code);
+        return ResponseEntity.ok().body(locationByCode);
+    }
 }
