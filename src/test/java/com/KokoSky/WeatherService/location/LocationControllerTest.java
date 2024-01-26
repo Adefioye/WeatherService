@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -212,6 +213,29 @@ public class LocationControllerTest {
                 .andExpect(jsonPath("$.country_code").value(newLocation.getCountryCode()))
                 .andExpect(jsonPath("$.enabled").value(newLocation.isEnabled()))
                 .andDo(print());
+    }
 
+    @Test
+    public void whenDeletingLocation_andLocationCodeAbsent_throwResourceNotFoundErrorWith404() throws Exception {
+        String code = "LACA_US";
+
+        String ENDPOINT_URI = "/api/v1/locations/%s".formatted(code);
+
+        doThrow(ResourceNotFoundException.class).when(locationService).deleteLocationByCode(code);
+
+        mockMvc.perform(delete(ENDPOINT_URI))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void whenDeletingLocation_andLocationCodePresent_returnResponseWithStatusCode200() throws Exception {
+        String code = "LACA_US";
+
+        String ENDPOINT_URI = "/api/v1/locations/%s".formatted(code);
+
+        mockMvc.perform(delete(ENDPOINT_URI))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 }

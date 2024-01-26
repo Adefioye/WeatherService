@@ -51,4 +51,12 @@ public class LocationService {
         return locationRepository.save(updatedLocation);
     }
 
+    public void deleteLocationByCode(String code) {
+        if (!locationRepository.existsLocationByCode(code)) {
+            throw new ResourceNotFoundException("Sorry! cannot find location with code: %s".formatted(code));
+        }
+
+        locationRepository.deleteById(code);
+    }
+
 }

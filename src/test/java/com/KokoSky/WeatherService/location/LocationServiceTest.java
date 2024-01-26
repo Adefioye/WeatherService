@@ -224,4 +224,34 @@ public class LocationServiceTest {
         verify(locationRepository, times(1)).save(any(Location.class));
     }
 
+    @Test
+    public void whenDeletingLocationByCode_andLocationCodeAbsent_throwResourceNotFoundException() {
+        // Given
+        String code = "LACA_US";
+        Location newLocation = new Location();
+
+        // When
+        when(locationRepository.existsLocationByCode(code)).thenReturn(false);
+
+        // Then
+        assertThatThrownBy(() -> underTest.deleteLocationByCode(code))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
+
+        verify(locationRepository, never()).deleteById(code);
+    }
+
+    @Test
+    public void whenDeletingLocationByCode_andLocationCodePresent_deleteLocation() {
+        // Given
+        String code = "LACA_US";
+
+        // When
+        when(locationRepository.existsLocationByCode(code)).thenReturn(true);
+
+        // Then
+       underTest.deleteLocationByCode(code);
+       verify(locationRepository, times(1)).deleteById(code);
+    }
+
 }

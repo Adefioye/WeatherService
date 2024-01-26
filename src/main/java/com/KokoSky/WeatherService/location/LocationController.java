@@ -49,4 +49,11 @@ public class LocationController {
         Location updatedLocationByCode = locationService.updateLocationByCode(code, newLocationRequest);
         return ResponseEntity.ok().body(updatedLocationByCode);
     }
+
+    @DeleteMapping("{code}")
+    public ResponseEntity<?> deleteLocation(@PathVariable String code) {
+        locationService.deleteLocationByCode(code);
+
+        return ResponseEntity.ok().build();
+    }
 }
