@@ -167,4 +167,61 @@ public class LocationServiceTest {
                 .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
     }
 
+    @Test
+    public void whenUpdatingLocation_andLocationCodeAbsent_throwResourceNotFoundException() {
+        // Given
+        String code = "LACA_US";
+        Location newLocation = new Location();
+
+        // When
+        when(locationRepository.existsLocationByCode(code)).thenReturn(false);
+
+         // Then
+        assertThatThrownBy(() -> underTest.updateLocationByCode(code, newLocation))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
+    }
+
+    @Test
+    public void whenUpdatingLocation_andLocationCodePresent_returnUpdatedLocation() {
+        // Given
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        String newCityName = "Los Angeles City";
+        String newRegionName = "California State";
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+        Location newLocation = Location
+                .builder()
+                .code(code)
+                .cityName(newCityName)
+                .regionName(newRegionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
+        when(locationRepository.existsLocationByCode(code)).thenReturn(true);
+        when(locationRepository.save(any(Location.class))).thenReturn(newLocation);
+        // When
+        Location updatedLocation = underTest.updateLocationByCode(code, newLocation);
+        // Then
+        assertThat(updatedLocation).isNotNull();
+        assertThat(updatedLocation.getCityName()).isEqualTo(newCityName);
+        assertThat(updatedLocation.getRegionName()).isEqualTo(newRegionName);
+        verify(locationRepository, times(1)).save(any(Location.class));
+    }
+
 }

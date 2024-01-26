@@ -17,8 +17,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -164,5 +163,55 @@ public class LocationControllerTest {
                 .andExpect(jsonPath("$.country_name").value(location.getCountryName()))
                 .andExpect(jsonPath("$.country_code").value(location.getCountryCode()))
                 .andDo(print());
+    }
+
+    @Test
+    public void whenGivenNewLocation_andInvalid_returnStatusCode400() throws Exception {
+        String code = "LACA_US";
+        Location location = new Location();
+
+        String ENDPOINT_URI = "/api/v1/locations/%s".formatted(code);
+
+        mockMvc.perform(put(ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(location)))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    public void whenGivenNewLocation_andValid_returnNewLocationStatusCode200() throws Exception {
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        Location newLocation = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
+        String ENDPOINT_URI = "/api/v1/locations/%s".formatted(code);
+
+        when(locationService.updateLocationByCode(code, newLocation)).thenReturn(newLocation);
+
+        mockMvc.perform(put(ENDPOINT_URI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newLocation)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(newLocation.getCode()))
+                .andExpect(jsonPath("$.city_name").value(newLocation.getCityName()))
+                .andExpect(jsonPath("$.region_name").value(newLocation.getRegionName()))
+                .andExpect(jsonPath("$.country_name").value(newLocation.getCountryName()))
+                .andExpect(jsonPath("$.country_code").value(newLocation.getCountryCode()))
+                .andExpect(jsonPath("$.enabled").value(newLocation.isEnabled()))
+                .andDo(print());
+
     }
 }
