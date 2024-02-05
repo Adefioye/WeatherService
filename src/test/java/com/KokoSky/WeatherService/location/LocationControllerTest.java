@@ -235,7 +235,7 @@ public class LocationControllerTest {
         String ENDPOINT_URI = "/api/v1/locations/%s".formatted(code);
 
         mockMvc.perform(delete(ENDPOINT_URI))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andDo(print());
     }
 }

@@ -54,6 +54,6 @@ public class LocationController {
     public ResponseEntity<?> deleteLocation(@PathVariable String code) {
         locationService.deleteLocationByCode(code);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
