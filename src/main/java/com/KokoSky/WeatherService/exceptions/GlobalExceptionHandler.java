@@ -1,6 +1,8 @@
 package com.KokoSky.WeatherService.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ApiError> exceptionHandler(
             DuplicateResourceException ex,
@@ -31,6 +35,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
+        LOGGER.error(ex.getMessage(), ex);
         return new ResponseEntity<>(apiError, HttpStatus.CONFLICT);
     }
 
@@ -62,6 +67,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
+        LOGGER.error(errorMessage, exception);
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
 
     }
@@ -79,6 +85,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
+        LOGGER.error(exception.getMessage(), exception);
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
 
     }
