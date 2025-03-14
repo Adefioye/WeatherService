@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeather;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -178,5 +180,51 @@ public class LocationRepositoryTest {
 
         // Then
         assertThat(locationByCode).isNotPresent();
+    }
+    
+    @Test
+    public void testRealTimeWeather_addedSuccesfullyThroughLocation() {
+        // Given
+        String locationCode = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = false;
+
+
+        Location location = Location
+                    .builder()
+                    .code(locationCode)
+                    .cityName(cityName)
+                    .regionName(regionName)
+                    .countryName(countryName)
+                    .countryCode(countryCode)
+                    .enabled(enabled)
+                    .trashed(trashed)
+                    .build();
+
+        RealtimeWeather realTimeWeather = RealtimeWeather
+                .builder()
+                .temperature(75)
+                .humidity(50)
+                .precipitation(1015)
+                .windSpeed(57)
+                .status("Snowy")
+                .lastUpdated(new Date())
+                .build();
+
+        // Set both location and realtimeWeather
+        location.setRealtimeWeather(realTimeWeather);
+        realTimeWeather.setLocation(location);
+
+        // When
+        underTest.save(location);
+        Optional<Location> savedLocation = underTest.findUntrashedLocationsByCode(locationCode);
+
+        // Then
+        assertThat(savedLocation).isPresent();
+        assertThat(savedLocation.get().getRealtimeWeather().getLocationCode()).isEqualTo(locationCode);
     }
 }
