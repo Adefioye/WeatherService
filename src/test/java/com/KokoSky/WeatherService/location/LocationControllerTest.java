@@ -28,6 +28,9 @@ public class LocationControllerTest {
     @MockBean
     private LocationService locationService;
 
+    @MockBean
+    private LocationRepository locationRepository;
+
     @Autowired
     MockMvc mockMvc;
 
@@ -167,16 +170,16 @@ public class LocationControllerTest {
     }
 
     @Test
-    public void whenGivenNewLocation_andInvalid_returnStatusCode400() throws Exception {
+    public void whenGivenNewLocation_andInvalid_returnStatusCode404() throws Exception {
         String code = "LACA_US";
         Location location = new Location();
 
-        String ENDPOINT_URI = "/api/v1/locations/%s".formatted(code);
+        String ENDPOINT_URI = "/api/v1/locations/";
 
         mockMvc.perform(put(ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(location)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andDo(print());
     }
 
@@ -198,9 +201,10 @@ public class LocationControllerTest {
                 .enabled(enabled)
                 .build();
 
-        String ENDPOINT_URI = "/api/v1/locations/%s".formatted(code);
+        String ENDPOINT_URI = "/api/v1/locations";
 
-        when(locationService.updateLocationByCode(code, newLocation)).thenReturn(newLocation);
+        when(locationService.updateLocationByCode(newLocation)).thenReturn(newLocation);
+        when(locationRepository.existsLocationByCode(newLocation.getCode())).thenReturn(true);
 
         mockMvc.perform(put(ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)

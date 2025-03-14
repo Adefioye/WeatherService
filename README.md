@@ -11,3 +11,9 @@
 - Add __logger factory__ to GlobalErrorHandler.
 - Add custom error message to @NotBlank validation annotation in location entity fields
 - Add list of errors to APIError in order to capture multiple validation errors for location entity values.
+
+## Essential docker commands used in project
+- `docker-compose up -d` to start the postgresSQL container
+- `docker ps` to verify postgres is running
+- `docker exec -it <container_name> psql -U koko -d weatherdb`
+- Inside psql shell, `\l` to check if weatherdb exists, `\dt` to list tables, `\q` to exit the psql shell.

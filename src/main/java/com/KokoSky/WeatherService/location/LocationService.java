@@ -33,7 +33,9 @@ public class LocationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Sorry! cannot find location with code: %s".formatted(code)));
     }
 
-    public Location updateLocationByCode(String code, Location newLocation) {
+    public Location updateLocationByCode(Location newLocation) {
+        String code = newLocation.getCode();
+
         if (!locationRepository.existsLocationByCode(code)) {
             throw new ResourceNotFoundException("Sorry! cannot find location with code: %s".formatted(code));
         }

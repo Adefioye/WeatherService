@@ -171,13 +171,27 @@ public class LocationServiceTest {
     public void whenUpdatingLocation_andLocationCodeAbsent_throwResourceNotFoundException() {
         // Given
         String code = "LACA_US";
-        Location newLocation = new Location();
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+
+        Location newLocation = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
 
         // When
         when(locationRepository.existsLocationByCode(code)).thenReturn(false);
 
          // Then
-        assertThatThrownBy(() -> underTest.updateLocationByCode(code, newLocation))
+        assertThatThrownBy(() -> underTest.updateLocationByCode(newLocation))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
     }
@@ -216,7 +230,7 @@ public class LocationServiceTest {
         when(locationRepository.existsLocationByCode(code)).thenReturn(true);
         when(locationRepository.save(any(Location.class))).thenReturn(newLocation);
         // When
-        Location updatedLocation = underTest.updateLocationByCode(code, newLocation);
+        Location updatedLocation = underTest.updateLocationByCode(newLocation);
         // Then
         assertThat(updatedLocation).isNotNull();
         assertThat(updatedLocation.getCityName()).isEqualTo(newCityName);

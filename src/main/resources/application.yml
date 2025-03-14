@@ -14,6 +14,9 @@ spring:
     url: jdbc:postgresql://localhost:5433/weatherdb
     username: koko
     password: password
+  sql:
+    init:
+      mode: always
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,6 +25,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         show_sql: true
+    defer:
+      datasource:
+        initialization: true
   main:
     web-application-type: servlet
 

@@ -43,10 +43,10 @@ public class LocationController {
         return ResponseEntity.ok().body(locationByCode);
     }
 
-    @PutMapping("{code}")
-    public ResponseEntity<Location> getLocations(@PathVariable String code, @RequestBody @Valid Location newLocationRequest) {
+    @PutMapping
+    public ResponseEntity<Location> updateLocation(@RequestBody @Valid Location newLocationRequest) {
 
-        Location updatedLocationByCode = locationService.updateLocationByCode(code, newLocationRequest);
+        Location updatedLocationByCode = locationService.updateLocationByCode(newLocationRequest);
         return ResponseEntity.ok().body(updatedLocationByCode);
     }
 
