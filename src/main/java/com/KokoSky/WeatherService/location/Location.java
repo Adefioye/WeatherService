@@ -32,6 +32,7 @@ public class Location {
 
     @Column(length = 128, nullable = false)
     @JsonProperty("region_name")
+    @NotBlank
     @NotNull
     private String regionName;
 
