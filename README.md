@@ -9,7 +9,6 @@
 - [ ] DELETE location API should return __204__ and not __200__ status code. Also delete operation is just supposed to set
 `trashed` field to `true`.
 - [x] Add __logger factory__ to GlobalErrorHandler.
-- [x] Add custom error message to @NotBlank validation annotation in location entity fields
 - [x] Add list of errors to APIError in order to capture multiple validation errors for location entity values.
 - [ ] Add CI/CD using Github actions to build the program and run unit and integration tests on push to main
 

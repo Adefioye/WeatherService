@@ -265,7 +265,7 @@ public class LocationServiceTest {
 
         // Then
        underTest.deleteLocationByCode(code);
-       verify(locationRepository, times(1)).deleteById(code);
+       verify(locationRepository, times(1)).softDeleteByCode(code);
     }
 
 }
