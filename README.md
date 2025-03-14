@@ -11,6 +11,7 @@
 - [ ] Add __logger factory__ to GlobalErrorHandler.
 - [ ] Add custom error message to @NotBlank validation annotation in location entity fields
 - [ ] Add list of errors to APIError in order to capture multiple validation errors for location entity values.
+- [ ] Add CI/CD using Github actions to build the program and run unit and integration tests on push to main
 
 ## Essential docker commands used in project
 - `docker-compose up -d` to start the postgresSQL container
