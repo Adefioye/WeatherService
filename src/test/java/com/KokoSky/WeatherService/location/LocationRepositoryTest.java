@@ -207,6 +207,7 @@ public class LocationRepositoryTest {
 
         RealtimeWeather realTimeWeather = RealtimeWeather
                 .builder()
+                .locationCode(locationCode)
                 .temperature(75)
                 .humidity(50)
                 .precipitation(1015)

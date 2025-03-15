@@ -8,3 +8,21 @@ CREATE TABLE IF NOT EXISTS locations (
     enabled BOOLEAN NOT NULL,  -- Enabled flag, not null
     trashed BOOLEAN NOT NULL DEFAULT false  -- Trashed flag, not null, default false
 );
+
+-- Create realtime_weather table
+CREATE TABLE IF NOT EXISTS realtime_weather (
+    location_code VARCHAR(12) PRIMARY KEY,
+    temperature INT NOT NULL,
+    humidity INT NOT NULL,
+    precipitation INT NOT NULL,
+    wind_speed INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    last_updated TIMESTAMP NOT NULL,
+
+    -- Foreign key constraint
+    CONSTRAINT fk_realtime_weather_location
+        FOREIGN KEY (location_code)
+        REFERENCES locations(code)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
