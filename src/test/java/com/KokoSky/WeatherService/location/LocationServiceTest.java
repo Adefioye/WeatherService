@@ -1,6 +1,7 @@
 package com.KokoSky.WeatherService.location;
 
 import com.KokoSky.WeatherService.exceptions.DuplicateResourceException;
+import com.KokoSky.WeatherService.exceptions.LocationNotFoundException;
 import com.KokoSky.WeatherService.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -163,7 +164,7 @@ public class LocationServiceTest {
 
         // When and Then
         assertThatThrownBy(() -> underTest.getLocationByCode(code))
-                .isInstanceOf(ResourceNotFoundException.class)
+                .isInstanceOf(LocationNotFoundException.class)
                 .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
     }
 
@@ -192,7 +193,7 @@ public class LocationServiceTest {
 
          // Then
         assertThatThrownBy(() -> underTest.updateLocationByCode(newLocation))
-                .isInstanceOf(ResourceNotFoundException.class)
+                .isInstanceOf(LocationNotFoundException.class)
                 .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
     }
 
@@ -249,7 +250,7 @@ public class LocationServiceTest {
 
         // Then
         assertThatThrownBy(() -> underTest.deleteLocationByCode(code))
-                .isInstanceOf(ResourceNotFoundException.class)
+                .isInstanceOf(LocationNotFoundException.class)
                 .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
 
         verify(locationRepository, never()).deleteById(code);

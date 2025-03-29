@@ -1,6 +1,7 @@
 package com.KokoSky.WeatherService.realtimeWeather;
 
 import com.KokoSky.WeatherService.location.Location;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,11 +25,14 @@ public class RealtimeWeather {
     private int temperature;
     private int humidity;
     private int precipitation;
+
+    @JsonProperty("wind_speed")
     private int windSpeed;
 
     @Column(length = 50)
     private String status;
 
+    @JsonProperty("last_updated")
     private Date lastUpdated;
 
     @OneToOne

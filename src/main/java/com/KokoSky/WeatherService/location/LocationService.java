@@ -2,6 +2,7 @@ package com.KokoSky.WeatherService.location;
 
 
 import com.KokoSky.WeatherService.exceptions.DuplicateResourceException;
+import com.KokoSky.WeatherService.exceptions.LocationNotFoundException;
 import com.KokoSky.WeatherService.exceptions.ResourceNotFoundException;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class LocationService {
 
     public Location getLocationByCode(String code) {
         return locationRepository.findUntrashedLocationsByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Sorry! cannot find location with code: %s".formatted(code)));
+                .orElseThrow(() -> new LocationNotFoundException("Sorry! cannot find location with code: %s".formatted(code)));
     }
 
     @Transactional
@@ -40,7 +41,7 @@ public class LocationService {
         String code = newLocation.getCode();
 
         if (!locationRepository.existsLocationByCode(code)) {
-            throw new ResourceNotFoundException("Sorry! cannot find location with code: %s".formatted(code));
+            throw new LocationNotFoundException("Sorry! cannot find location with code: %s".formatted(code));
         }
 
         Location updatedLocation = Location
@@ -59,7 +60,7 @@ public class LocationService {
     @Transactional
     public void deleteLocationByCode(String code) {
         if (!locationRepository.existsLocationByCode(code)) {
-            throw new ResourceNotFoundException("Sorry! cannot find location with code: %s".formatted(code));
+            throw new LocationNotFoundException("Sorry! cannot find location with code: %s".formatted(code));
         }
 
         locationRepository.softDeleteByCode(code);
