@@ -3,16 +3,13 @@ package com.KokoSky.WeatherService.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
@@ -88,6 +85,23 @@ public class GlobalExceptionHandler {
         LOGGER.error(exception.getMessage(), exception);
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
 
+    }
+
+    @ExceptionHandler(LocationNotFoundException.class)
+    public ResponseEntity<ApiError> handleException(
+            LocationNotFoundException exception,
+            HttpServletRequest request
+    ) {
+
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                exception.getMessage(),
+                HttpStatus.NOT_FOUND.value(),
+                LocalDateTime.now()
+        );
+
+        LOGGER.error(exception.getMessage(), exception);
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }
 
 }

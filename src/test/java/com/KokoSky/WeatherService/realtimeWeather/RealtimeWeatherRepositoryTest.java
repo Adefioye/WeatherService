@@ -135,4 +135,104 @@ public class RealtimeWeatherRepositoryTest {
         assertThat(actual.getHumidity()).isEqualTo(50);
 
     }
+
+    @Test
+    public void testFindByLocationCodeReturnNull_ifLocationCodeNotFound() {
+        String locationCode = "ABCXYZ";
+        RealtimeWeather realtimeWeather = underTest.findByLocationCode(locationCode);
+
+        assertThat(realtimeWeather).isNull();
+    }
+
+    @Test
+    public void testFindByLocationCodeReturnNull_ifLocationIsTrashed() {
+        // Given
+        String locationCode = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = true;
+
+
+        Location location = Location
+                .builder()
+                .code(locationCode)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        RealtimeWeather realTimeWeather = RealtimeWeather
+                .builder()
+                .temperature(75)
+                .humidity(50)
+                .precipitation(1015)
+                .windSpeed(57)
+                .status("Snowy")
+                .lastUpdated(new Date())
+                .build();
+
+        // Set location on realtimeWeather
+        location.setRealtimeWeather(realTimeWeather);
+        realTimeWeather.setLocation(location);
+
+        // Save location
+        locationRepository.save(location);
+
+        RealtimeWeather actual = underTest.findByLocationCode(locationCode);
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
+    public void testFindByLocationCodeReturnNotNull_ifLocationIsNotTrashed() {
+        // Given
+        String locationCode = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = false;
+
+
+        Location location = Location
+                .builder()
+                .code(locationCode)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        RealtimeWeather realTimeWeather = RealtimeWeather
+                .builder()
+                .temperature(75)
+                .humidity(50)
+                .precipitation(1015)
+                .windSpeed(57)
+                .status("Snowy")
+                .lastUpdated(new Date())
+                .build();
+
+        // Set location on realtimeWeather
+        location.setRealtimeWeather(realTimeWeather);
+        realTimeWeather.setLocation(location);
+
+        // Save location
+        locationRepository.save(location);
+
+        RealtimeWeather actual = underTest.findByLocationCode(locationCode);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getLocationCode()).isEqualTo(locationCode);
+        assertThat(actual.getHumidity()).isEqualTo(50);
+    }
 }

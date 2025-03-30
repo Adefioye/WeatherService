@@ -62,4 +62,9 @@ public class Location {
         this.countryName = countryName;
         this.countryCode = countryCode;
     }
+
+    @Override
+    public String toString() {
+        return cityName + ", " + (regionName != null ? regionName : "") + ", " + countryName;
+    }
 }

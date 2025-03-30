@@ -95,8 +95,6 @@ public class RealtimeWeatherControllerTest {
         location.setRealtimeWeather(realTimeWeather);
         realTimeWeather.setLocation(location);
 
-//        String expectedLocation = location.getCityName() + ", " + location.getRegionName() + ", " + location.getCountryName();
-
         when(geolocationService.getLocation(anyString())).thenReturn(location);
         when(realWeatherService.getByLocation(location)).thenReturn(realTimeWeather);
 
@@ -108,4 +106,69 @@ public class RealtimeWeatherControllerTest {
                 .andExpect(jsonPath("$.location.country_name").value(countryName))
                 .andDo(print());
     }
+
+    @Test
+    public void testGetbyLocationCodeShouldReturnNotFound_with404StatusCode() throws Exception {
+        String locationCode = "ABC_US";
+
+        when(realWeatherService.getByLocationCode(locationCode)).thenThrow(LocationNotFoundException.class);
+
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByLocationCodeShouldReturnSuccess_with200StatusCode() throws Exception {
+        // Given
+        String locationCode = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = false;
+
+
+        Location location = Location
+                .builder()
+                .code(locationCode)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        RealtimeWeather realTimeWeather = RealtimeWeather
+                .builder()
+                .temperature(75)
+                .humidity(50)
+                .precipitation(1015)
+                .windSpeed(57)
+                .status("Snowy")
+                .lastUpdated(new Date())
+                .build();
+
+        // Set location on realtimeWeather
+        location.setRealtimeWeather(realTimeWeather);
+        realTimeWeather.setLocation(location);
+
+        when(realWeatherService.getByLocationCode(locationCode)).thenReturn(realTimeWeather);
+
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+        String expectedLocation = location.getCityName() + ", " + location.getRegionName() + ", " + location.getCountryName();
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.location").value(expectedLocation))
+                .andExpect(jsonPath("$.temperature").value(75))
+                .andExpect(jsonPath("$.status").value("Snowy"))
+                .andDo(print());
+    }
+
 }

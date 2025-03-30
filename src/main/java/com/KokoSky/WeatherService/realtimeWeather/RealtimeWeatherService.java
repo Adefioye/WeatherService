@@ -26,4 +26,16 @@ public class RealtimeWeatherService {
 
         return realtimeWeather;
     }
+
+    public RealtimeWeather getByLocationCode(String locationCode) {
+
+        RealtimeWeather realtimeWeather = realtimeWeatherRepository.findByLocationCode(locationCode);
+
+        if (realtimeWeather == null) {
+            throw new LocationNotFoundException(
+                    "Sorry! cannot find realtime weather for location code: %s".formatted(locationCode));
+        }
+
+        return realtimeWeather;
+    }
 }
