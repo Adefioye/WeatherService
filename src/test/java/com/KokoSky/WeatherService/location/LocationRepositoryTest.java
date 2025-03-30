@@ -208,10 +208,10 @@ public class LocationRepositoryTest {
         RealtimeWeather realTimeWeather = RealtimeWeather
                 .builder()
                 .locationCode(locationCode)
-                .temperature(75)
-                .humidity(50)
-                .precipitation(1015)
-                .windSpeed(57)
+                .temperature(15)
+                .humidity(32)
+                .precipitation(57)
+                .windSpeed(40)
                 .status("Snowy")
                 .lastUpdated(new Date())
                 .build();

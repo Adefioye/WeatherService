@@ -112,10 +112,10 @@ public class RealtimeWeatherRepositoryTest {
 
         RealtimeWeather realTimeWeather = RealtimeWeather
                 .builder()
-                .temperature(75)
-                .humidity(50)
-                .precipitation(1015)
-                .windSpeed(57)
+                .temperature(15)
+                .humidity(30)
+                .precipitation(15)
+                .windSpeed(43)
                 .status("Snowy")
                 .lastUpdated(new Date())
                 .build();
@@ -132,7 +132,7 @@ public class RealtimeWeatherRepositoryTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getLocation().getCityName()).isEqualTo(cityName);
-        assertThat(actual.getHumidity()).isEqualTo(50);
+        assertThat(actual.getHumidity()).isEqualTo(30);
 
     }
 
@@ -169,10 +169,10 @@ public class RealtimeWeatherRepositoryTest {
 
         RealtimeWeather realTimeWeather = RealtimeWeather
                 .builder()
-                .temperature(75)
-                .humidity(50)
-                .precipitation(1015)
-                .windSpeed(57)
+                .temperature(5)
+                .humidity(15)
+                .precipitation(40)
+                .windSpeed(35)
                 .status("Snowy")
                 .lastUpdated(new Date())
                 .build();
@@ -214,10 +214,10 @@ public class RealtimeWeatherRepositoryTest {
 
         RealtimeWeather realTimeWeather = RealtimeWeather
                 .builder()
-                .temperature(75)
-                .humidity(50)
-                .precipitation(1015)
-                .windSpeed(57)
+                .temperature(15)
+                .humidity(20)
+                .precipitation(35)
+                .windSpeed(40)
                 .status("Snowy")
                 .lastUpdated(new Date())
                 .build();
@@ -233,6 +233,6 @@ public class RealtimeWeatherRepositoryTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getLocationCode()).isEqualTo(locationCode);
-        assertThat(actual.getHumidity()).isEqualTo(50);
+        assertThat(actual.getHumidity()).isEqualTo(20);
     }
 }

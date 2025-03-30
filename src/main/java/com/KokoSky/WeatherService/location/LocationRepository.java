@@ -20,4 +20,7 @@ public interface LocationRepository extends CrudRepository<Location, String> {
     @Modifying
     @Query("UPDATE Location l SET l.trashed = true WHERE l.code = ?1")
     void softDeleteByCode(String code);
+
+    @Query("SELECT l FROM Location l WHERE l.trashed = false AND l.code = ?1")
+    Location findByCode(String code);
 }

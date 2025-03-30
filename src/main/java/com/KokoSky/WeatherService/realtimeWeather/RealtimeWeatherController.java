@@ -6,14 +6,12 @@ import com.KokoSky.WeatherService.geolocation.GeolocationService;
 import com.KokoSky.WeatherService.location.Location;
 import com.KokoSky.WeatherService.utility.CommonUtility;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/realtime")
@@ -41,9 +39,8 @@ public class RealtimeWeatherController {
         try {
             Location locationByIPAddress = geolocationService.getLocation(ipAddress);
             RealtimeWeather realtimeWeather = realtimeWeatherService.getByLocation(locationByIPAddress);
-            RealtimeWeatherDTO dto = modelMapper.map(realtimeWeather, RealtimeWeatherDTO.class);
 
-            return ResponseEntity.ok(dto);
+            return ResponseEntity.ok(entity2DTO(realtimeWeather));
         } catch (GeolocationException e) {
             LOGGER.error(e.getMessage(), e);
 
@@ -66,5 +63,25 @@ public class RealtimeWeatherController {
             LOGGER.error(e.getMessage(), e);
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/{locationCode}")
+    public ResponseEntity<?> updateRealtimeWeather(@PathVariable("locationCode") String locationCode,
+                                                   @RequestBody @Valid RealtimeWeather realtimeWeatherRequest) {
+
+        realtimeWeatherRequest.setLocationCode(locationCode);
+
+        try {
+            RealtimeWeather updatedRealtimeWeather = realtimeWeatherService.update(locationCode, realtimeWeatherRequest);
+
+            return ResponseEntity.ok(entity2DTO(updatedRealtimeWeather));
+
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    private RealtimeWeatherDTO entity2DTO(RealtimeWeather realtimeWeather) {
+        return modelMapper.map(realtimeWeather, RealtimeWeatherDTO.class);
     }
 }

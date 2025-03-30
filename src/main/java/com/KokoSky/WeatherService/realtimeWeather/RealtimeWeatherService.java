@@ -2,15 +2,24 @@ package com.KokoSky.WeatherService.realtimeWeather;
 
 import com.KokoSky.WeatherService.exceptions.LocationNotFoundException;
 import com.KokoSky.WeatherService.location.Location;
+import com.KokoSky.WeatherService.location.LocationRepository;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 public class RealtimeWeatherService {
 
     private final RealtimeWeatherRepository realtimeWeatherRepository;
+    private final LocationRepository locationRepository;
 
-    public RealtimeWeatherService(RealtimeWeatherRepository realtimeWeatherRepository) {
+    public RealtimeWeatherService(
+            RealtimeWeatherRepository realtimeWeatherRepository,
+            LocationRepository locationRepository
+    ) {
         this.realtimeWeatherRepository = realtimeWeatherRepository;
+        this.locationRepository = locationRepository;
     }
 
     public RealtimeWeather getByLocation(Location location) {
@@ -37,5 +46,26 @@ public class RealtimeWeatherService {
         }
 
         return realtimeWeather;
+    }
+
+    public RealtimeWeather update(String locationCode, RealtimeWeather realtimeWeather) {
+        Location location = locationRepository.findByCode(locationCode);
+
+        if (location == null) {
+            throw new LocationNotFoundException(
+                    "Sorry! cannot find realtime weather for location code: %s".formatted(locationCode));
+        }
+
+        realtimeWeather.setLocation(location);
+        realtimeWeather.setLastUpdated(new Date());
+
+        if (location.getRealtimeWeather() == null) {
+            location.setRealtimeWeather(realtimeWeather);
+            Location updatedLocation = locationRepository.save(location);
+
+            return updatedLocation.getRealtimeWeather();
+        }
+
+        return realtimeWeatherRepository.save(realtimeWeather);
     }
 }
