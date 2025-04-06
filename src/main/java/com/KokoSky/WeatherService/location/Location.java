@@ -1,5 +1,6 @@
 package com.KokoSky.WeatherService.location;
 
+import com.KokoSky.WeatherService.hourlyWeather.HourlyWeather;
 import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeather;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,6 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -55,6 +59,10 @@ public class Location {
     @PrimaryKeyJoinColumn
     @JsonIgnore
     private RealtimeWeather realtimeWeather;
+
+    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<HourlyWeather> listHourlyWeather = new ArrayList<>();
 
     public Location(String cityName, String regionName, String countryName, String countryCode) {
         this.cityName = cityName;

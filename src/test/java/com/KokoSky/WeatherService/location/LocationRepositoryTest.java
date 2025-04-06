@@ -1,5 +1,8 @@
 package com.KokoSky.WeatherService.location;
 
+import com.KokoSky.WeatherService.hourlyWeather.HourlyWeather;
+import com.KokoSky.WeatherService.hourlyWeather.HourlyWeatherId;
+import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeather;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeather;
 
 import java.util.Date;
 import java.util.List;
@@ -227,5 +229,64 @@ public class LocationRepositoryTest {
         // Then
         assertThat(savedLocation).isPresent();
         assertThat(savedLocation.get().getRealtimeWeather().getLocationCode()).isEqualTo(locationCode);
+    }
+
+    @Test
+    public void testAddHourlyWeatherData() {
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
+        underTest.save(location);
+
+        Location expectedLocation = underTest.findByCode(code);
+        List<HourlyWeather> listOfHourWeather = expectedLocation.getListHourlyWeather();
+        assertThat(listOfHourWeather).isEmpty();
+
+        HourlyWeatherId hourlyWeatherId1 = HourlyWeatherId
+                                                .builder()
+                                                .location(location)
+                                                .hourOfDay(10)
+                                                .build();
+
+        HourlyWeatherId hourlyWeatherId2 = HourlyWeatherId
+                .builder()
+                .location(location)
+                .hourOfDay(11)
+                .build();
+
+        HourlyWeather hourlyForecast1 = HourlyWeather.builder()
+                .id(hourlyWeatherId1)
+                .temperature(15)
+                .precipitation(40)
+                .status("Sunny")
+                .build();
+
+        HourlyWeather hourlyForecast2 = HourlyWeather.builder()
+                .id(hourlyWeatherId2)
+                .temperature(15)
+                .precipitation(40)
+                .status("Sunny")
+                .build();
+
+        // Add hourly weather forecasts and verify that they are correctly added
+        listOfHourWeather.add(hourlyForecast1);
+        listOfHourWeather.add(hourlyForecast2);
+
+        assertThat(listOfHourWeather).isNotEmpty();
+        assertThat(listOfHourWeather.size()).isEqualTo(2);
     }
 }
