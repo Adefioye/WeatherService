@@ -1,6 +1,5 @@
 package com.KokoSky.WeatherService.hourlyWeather;
 
-import com.KokoSky.WeatherService.location.Location;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -16,7 +15,6 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
 public class HourlyWeather {
 
     @EmbeddedId
