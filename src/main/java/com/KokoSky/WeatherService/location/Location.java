@@ -7,24 +7,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "locations")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Location {
     @Id
     @Column(length = 12, nullable = false, unique = true)
     @NotBlank
+    @EqualsAndHashCode.Include
     private String code;
 
     @Column(length = 128, nullable = false)

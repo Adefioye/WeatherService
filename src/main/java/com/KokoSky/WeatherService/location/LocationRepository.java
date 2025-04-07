@@ -23,4 +23,7 @@ public interface LocationRepository extends CrudRepository<Location, String> {
 
     @Query("SELECT l FROM Location l WHERE l.trashed = false AND l.code = ?1")
     Location findByCode(String code);
+
+    @Query("SELECT l from Location l WHERE l.trashed = false AND l.countryCode = ?1 AND l.cityName = ?2")
+    Location findByCountryCodeAndCityName(String countryCode, String cityName);
 }
