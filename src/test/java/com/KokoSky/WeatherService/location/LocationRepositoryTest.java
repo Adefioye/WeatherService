@@ -289,4 +289,79 @@ public class LocationRepositoryTest {
         assertThat(listOfHourWeather).isNotEmpty();
         assertThat(listOfHourWeather.size()).isEqualTo(2);
     }
+
+    @Test
+    public void testFindByCountryCodeAndCityNameIsSuccessful() {
+        // When
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = false;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        // When
+        underTest.save(location);
+        Location actual = underTest.findByCountryCodeAndCityName(countryCode, cityName);
+
+        // Then
+        assertThat(actual).isNotNull();
+    }
+
+    @Test
+    public void testFindByCountryCodeAndCityNameNotSuccessful() {
+        // When
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = false;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        // When
+        underTest.save(location);
+        Location actual = underTest.findByCountryCodeAndCityName(countryCode, cityName);
+
+        // If trashed is false, it is not NULL
+        assertThat(actual).isNotNull();
+
+        // If trashed is true, it is NULL
+        location.setTrashed(true);
+        underTest.save(location);
+
+        Location secondActual = underTest.findByCountryCodeAndCityName(countryCode, cityName);
+        assertThat(secondActual).isNull();
+
+        // If countryCode and cityName are absent in database, return NULL
+        String missingCountryCode = "IN";
+        String missingCityName = "DELHI";
+
+        Location thirdActual = underTest.findByCountryCodeAndCityName(missingCountryCode, missingCityName);
+        assertThat(thirdActual).isNull();
+    }
+
 }
