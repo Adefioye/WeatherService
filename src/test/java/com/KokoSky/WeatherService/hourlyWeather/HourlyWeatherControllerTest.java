@@ -13,13 +13,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(HourlyWeatherController.class)
 public class HourlyWeatherControllerTest {
@@ -129,6 +129,97 @@ public class HourlyWeatherControllerTest {
 
         mockMvc.perform(get(END_POINT_PATH).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
                 .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByLocationCodeShouldReturn400BadRequest() throws Exception {
+        String locationCode = "DELHI_IN";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByLocationCodeShouldReturn404NotFound() throws Exception {
+        int currentHour = 9;
+        String locationCode = "DELHI_IN";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenThrow(LocationNotFoundException.class);
+
+        mockMvc.perform(get(requestURI).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByLocationCodeShouldReturn204NoContent() throws Exception {
+        int currentHour = 9;
+        String locationCode = "DELHI_IN";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get(requestURI).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByLocationCodeShouldReturn200OK() throws Exception {
+        int currentHour = 9;
+        String locationCode = "DELHI_IN";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        Location location = Location
+                .builder()
+                .code("NYC_USA")
+                .cityName("New York City")
+                .regionName("New York")
+                .countryCode("US")
+                .countryName("United States of America")
+                .build();
+
+        HourlyWeatherId hourlyWeatherId1 = HourlyWeatherId
+                .builder()
+                .location(location)
+                .hourOfDay(10)
+                .build();
+
+        HourlyWeatherId hourlyWeatherId2 = HourlyWeatherId
+                .builder()
+                .location(location)
+                .hourOfDay(11)
+                .build();
+
+        HourlyWeather forecast1 = HourlyWeather
+                .builder()
+                .id(hourlyWeatherId1)
+                .temperature(13)
+                .precipitation(70)
+                .status("Cloudy")
+                .build();
+
+        HourlyWeather forecast2 = HourlyWeather
+                .builder()
+                .id(hourlyWeatherId2)
+                .temperature(15)
+                .precipitation(60)
+                .status("Sunny")
+                .build();
+
+        var hourlyForecast = List.of(forecast1, forecast2);
+
+        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenReturn(hourlyForecast);
+
+        mockMvc.perform(get(requestURI).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.location", is(location.toString())))
+                .andExpect(jsonPath("$.hourly_forecast[0].hour_of_day", is(10)))
                 .andDo(print());
     }
 }

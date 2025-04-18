@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -57,6 +58,31 @@ public class HourlyWeatherController {
 
     }
 
+    @GetMapping("/{locationCode}")
+    public ResponseEntity<?> listHourlyForecastByLocationCode(
+            @PathVariable("locationCode") String locationCode, HttpServletRequest request) {
+
+        try {
+            int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));
+
+            List<HourlyWeather> hourlyForecast = hourlyWeatherService.getByLocationCode(locationCode, currentHour);
+
+            if (hourlyForecast.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            return ResponseEntity.ok(listEntity2DTO(hourlyForecast));
+
+        } catch (NumberFormatException ex) {
+
+            return ResponseEntity.badRequest().build();
+
+        } catch (LocationNotFoundException ex) {
+
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     private HourlyWeatherListDTO listEntity2DTO(List<HourlyWeather> hourlyForecast) {
         Location location = hourlyForecast.get(0).getId().getLocation();
 
@@ -69,6 +95,7 @@ public class HourlyWeatherController {
         });
 
         return listDTO;
-
     }
+
+
 }
