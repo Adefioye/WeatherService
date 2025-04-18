@@ -1,6 +1,7 @@
 package com.KokoSky.WeatherService.hourlyWeather;
 
 import com.KokoSky.WeatherService.exceptions.GeolocationException;
+import com.KokoSky.WeatherService.exceptions.LocationNotFoundException;
 import com.KokoSky.WeatherService.geolocation.GeolocationService;
 import com.KokoSky.WeatherService.location.Location;
 import org.junit.jupiter.api.Test;
@@ -116,6 +117,18 @@ public class HourlyWeatherControllerTest {
                 .andExpect(jsonPath("$.hourly_forecast[0].hour_of_day", is(10)))
                 .andExpect(jsonPath("$.hourly_forecast[1].hour_of_day", is(11)))
                 .andDo(print());
+    }
 
+    @Test
+    public void testGetByIPShouldReturn404NotFound() throws Exception {
+        Location location = Location.builder().code("DELHI_IN").build();
+        int currentHour = 9;
+
+        when(geolocationService.getLocation(Mockito.anyString())).thenReturn(location);
+        when(hourlyWeatherService.getByLocation(location, currentHour)).thenThrow(LocationNotFoundException.class);
+
+        mockMvc.perform(get(END_POINT_PATH).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
+                .andExpect(status().isNotFound())
+                .andDo(print());
     }
 }
