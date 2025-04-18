@@ -1,5 +1,7 @@
 package com.KokoSky.WeatherService;
 
+import com.KokoSky.WeatherService.hourlyWeather.HourlyWeather;
+import com.KokoSky.WeatherService.hourlyWeather.HourlyWeatherDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +15,9 @@ public class Main {
 	public ModelMapper getModelMapper() {
 		ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
+		var typeMap = mapper.typeMap(HourlyWeather.class, HourlyWeatherDTO.class);
+		typeMap.addMapping(src -> src.getId().getHourOfDay(), HourlyWeatherDTO::setHourOfDay);
 		return mapper;
 	}
 

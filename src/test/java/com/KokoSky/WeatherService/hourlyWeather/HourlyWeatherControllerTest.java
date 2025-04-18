@@ -1,0 +1,121 @@
+package com.KokoSky.WeatherService.hourlyWeather;
+
+import com.KokoSky.WeatherService.exceptions.GeolocationException;
+import com.KokoSky.WeatherService.geolocation.GeolocationService;
+import com.KokoSky.WeatherService.location.Location;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.hamcrest.CoreMatchers.is;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(HourlyWeatherController.class)
+public class HourlyWeatherControllerTest {
+
+    private static final String X_CURRENT_HOUR = "X-Current-Hour";
+
+    private static final String END_POINT_PATH = "/api/v1/hourly";
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private HourlyWeatherService hourlyWeatherService;
+
+    @MockBean
+    private GeolocationService geolocationService;
+
+    @Test
+    public void testGetByIPShouldReturn400BadRequestBecauseNoHeaderXCurrentHour() throws Exception {
+        mockMvc.perform(get(END_POINT_PATH))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByIPShouldReturn400BadRequestBecauseGeolocationException() throws Exception {
+        when(geolocationService.getLocation(Mockito.anyString())).thenThrow(GeolocationException.class);
+
+        mockMvc.perform(get(END_POINT_PATH).header(X_CURRENT_HOUR, "9"))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByIPShouldReturn204NoContent() throws Exception {
+        int currentHour = 9;
+        Location location = Location.builder().code("DELHI_IN").build();
+
+        when(geolocationService.getLocation(Mockito.anyString())).thenReturn(location);
+        when(hourlyWeatherService.getByLocation(location, currentHour)).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get(END_POINT_PATH).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByIPShouldReturn200OK() throws Exception {
+        int currentHour = 9;
+        Location location = Location
+                .builder()
+                .code("NYC_USA")
+                .cityName("New York City")
+                .regionName("New York")
+                .countryCode("US")
+                .countryName("United States of America")
+                .build();
+
+        HourlyWeatherId hourlyWeatherId1 = HourlyWeatherId
+                .builder()
+                .location(location)
+                .hourOfDay(10)
+                .build();
+
+        HourlyWeatherId hourlyWeatherId2 = HourlyWeatherId
+                .builder()
+                .location(location)
+                .hourOfDay(11)
+                .build();
+
+        HourlyWeather forecast1 = HourlyWeather
+                .builder()
+                .id(hourlyWeatherId1)
+                .temperature(13)
+                .precipitation(70)
+                .status("Cloudy")
+                .build();
+
+        HourlyWeather forecast2 = HourlyWeather
+                .builder()
+                .id(hourlyWeatherId2)
+                .temperature(15)
+                .precipitation(60)
+                .status("Sunny")
+                .build();
+
+        when(geolocationService.getLocation(Mockito.anyString())).thenReturn(location);
+        when(hourlyWeatherService.getByLocation(location, currentHour)).thenReturn(List.of(forecast1, forecast2));
+
+        String expectedLocation = location.toString();
+
+        mockMvc.perform(get(END_POINT_PATH).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.location", is(expectedLocation)))
+                .andExpect(jsonPath("$.hourly_forecast[0].hour_of_day", is(10)))
+                .andExpect(jsonPath("$.hourly_forecast[1].hour_of_day", is(11)))
+                .andDo(print());
+
+    }
+}
