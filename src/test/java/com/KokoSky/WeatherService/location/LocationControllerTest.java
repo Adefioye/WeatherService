@@ -55,13 +55,23 @@ public class LocationControllerTest {
                 .enabled(enabled)
                 .build();
 
+        LocationDTO dtoLocation = LocationDTO
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
         String ENDPOINT_URI = "/api/v1/locations";
 
         when(locationService.addLocation(any(Location.class))).thenReturn(location);
 
         mockMvc.perform(post(ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(location)))
+                        .content(objectMapper.writeValueAsString(dtoLocation)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "%s/%s".formatted(ENDPOINT_URI, location.getCode())))
                 .andExpect(jsonPath("$.code").value(location.getCode()))
@@ -70,12 +80,11 @@ public class LocationControllerTest {
                 .andExpect(jsonPath("$.country_name").value(location.getCountryName()))
                 .andExpect(jsonPath("$.country_code").value(location.getCountryCode()))
                 .andDo(print());
-
     }
 
     @Test
     public void whenPostEmptyLocation_returnStatusCode400() throws Exception {
-        Location location = new Location();
+        LocationDTO location = LocationDTO.builder().build();
 
         String ENDPOINT_URI = "/api/v1/locations";
 
@@ -156,6 +165,16 @@ public class LocationControllerTest {
                 .enabled(enabled)
                 .build();
 
+        LocationDTO dtoLocation = LocationDTO
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
         String ENDPOINT_URI = "/api/v1/locations/%s";
         when(locationService.getLocationByCode(code)).thenReturn(location);
 
@@ -201,6 +220,16 @@ public class LocationControllerTest {
                 .enabled(enabled)
                 .build();
 
+        LocationDTO dtoNewLocation = LocationDTO
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .build();
+
         String ENDPOINT_URI = "/api/v1/locations";
 
         when(locationService.updateLocationByCode(newLocation)).thenReturn(newLocation);
@@ -208,7 +237,7 @@ public class LocationControllerTest {
 
         mockMvc.perform(put(ENDPOINT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newLocation)))
+                        .content(objectMapper.writeValueAsString(dtoNewLocation)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(newLocation.getCode()))
                 .andExpect(jsonPath("$.city_name").value(newLocation.getCityName()))

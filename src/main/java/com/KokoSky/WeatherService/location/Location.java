@@ -24,36 +24,22 @@ import java.util.List;
 public class Location {
     @Id
     @Column(length = 12, nullable = false, unique = true)
-    @NotBlank
-    @EqualsAndHashCode.Include
     private String code;
 
     @Column(length = 128, nullable = false)
-    @NotBlank
-    @JsonProperty("city_name")
     private String cityName;
 
     @Column(length = 128, nullable = false)
-    @JsonProperty("region_name")
-    @NotBlank
-    @NotNull
     private String regionName;
 
     @Column(length = 64, nullable = false)
-    @NotBlank
-    @JsonProperty("country_name")
     private String countryName;
 
     @Column(length = 2, nullable = false)
-    @NotBlank
-    @JsonProperty("country_code")
     private String countryCode;
 
-    @NotNull
     private boolean enabled;
 
-    @NotNull
-    @JsonIgnore
     private boolean trashed = false;
 
     @OneToOne(mappedBy = "location", cascade = CascadeType.ALL)
