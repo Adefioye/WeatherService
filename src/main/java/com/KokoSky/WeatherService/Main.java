@@ -16,8 +16,12 @@ public class Main {
 		ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
-		var typeMap = mapper.typeMap(HourlyWeather.class, HourlyWeatherDTO.class);
-		typeMap.addMapping(src -> src.getId().getHourOfDay(), HourlyWeatherDTO::setHourOfDay);
+		var typeMap1 = mapper.typeMap(HourlyWeather.class, HourlyWeatherDTO.class);
+		typeMap1.addMapping(src -> src.getId().getHourOfDay(), HourlyWeatherDTO::setHourOfDay);
+
+		var typeMap2 = mapper.typeMap(HourlyWeatherDTO.class, HourlyWeather.class);
+		typeMap2.addMapping(HourlyWeatherDTO::getHourOfDay,
+				(dest, value) ->	dest.getId().setHourOfDay(value != null ? (int) value : 0));
 		return mapper;
 	}
 
