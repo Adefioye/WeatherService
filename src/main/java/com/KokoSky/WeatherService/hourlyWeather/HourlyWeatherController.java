@@ -1,5 +1,6 @@
 package com.KokoSky.WeatherService.hourlyWeather;
 
+import com.KokoSky.WeatherService.exceptions.BadRequestException;
 import com.KokoSky.WeatherService.exceptions.GeolocationException;
 import com.KokoSky.WeatherService.exceptions.LocationNotFoundException;
 import com.KokoSky.WeatherService.geolocation.GeolocationService;
@@ -8,10 +9,7 @@ import com.KokoSky.WeatherService.utility.CommonUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -81,6 +79,17 @@ public class HourlyWeatherController {
 
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/{locationCode}")
+    public ResponseEntity<?> updateHourlyForecast(@PathVariable("locationCode") String locationCode,
+                                                  @RequestBody List<HourlyWeatherDTO> listDTO) throws BadRequestException {
+
+        if (listDTO.isEmpty()) {
+            throw new BadRequestException("Hourly forecast data cannot be empty");
+        }
+
+        return ResponseEntity.accepted().build();
     }
 
     private HourlyWeatherListDTO listEntity2DTO(List<HourlyWeather> hourlyForecast) {

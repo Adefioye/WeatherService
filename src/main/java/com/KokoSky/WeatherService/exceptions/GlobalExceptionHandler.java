@@ -104,4 +104,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiError> handleException(
+            BadRequestException exception,
+            HttpServletRequest request
+    ) {
+
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                exception.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+
+        LOGGER.error(exception.getMessage(), exception);
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
 }

@@ -5,6 +5,7 @@ import com.KokoSky.WeatherService.location.Location;
 import com.KokoSky.WeatherService.location.LocationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -40,5 +41,9 @@ public class HourlyWeatherService {
         }
 
         return hourlyWeatherRepository.findByLocationCodeAndHour(locationCode, currentHour);
+    }
+
+    public List<HourlyWeather> updateByLocationCode(String locationCode, List<HourlyWeather> hourlyForecastInRequest) {
+        return Collections.emptyList();
     }
 }

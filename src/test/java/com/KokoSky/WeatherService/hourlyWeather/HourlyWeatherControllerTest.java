@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -18,8 +19,10 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(HourlyWeatherController.class)
 public class HourlyWeatherControllerTest {
@@ -30,6 +33,9 @@ public class HourlyWeatherControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private HourlyWeatherService hourlyWeatherService;
@@ -220,6 +226,20 @@ public class HourlyWeatherControllerTest {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.location", is(location.toString())))
                 .andExpect(jsonPath("$.hourly_forecast[0].hour_of_day", is(10)))
+                .andDo(print());
+    }
+
+    @Test
+    public void testUpdateByLocationCodeShouldReturn400BadRequestBecauseNoData() throws Exception {
+        String requestURI = END_POINT_PATH + "/NYC_USA";
+
+        List<HourlyWeatherDTO> listDTO = Collections.emptyList();
+
+        String requestBody = objectMapper.writeValueAsString(listDTO);
+
+        mockMvc.perform(put(requestURI).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Hourly forecast data cannot be empty")))
                 .andDo(print());
     }
 }
