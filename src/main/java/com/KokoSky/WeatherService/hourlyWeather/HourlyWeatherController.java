@@ -50,14 +50,10 @@ public class HourlyWeatherController {
             }
 
             return ResponseEntity.ok(listEntity2DTO(hourlyForecast));
-        } catch (NumberFormatException | GeolocationException ex) {
+        } catch (NumberFormatException e) {
 
             return ResponseEntity.badRequest().build();
-        } catch (LocationNotFoundException ex) {
-
-            return ResponseEntity.notFound().build();
         }
-
     }
 
     @GetMapping("/{locationCode}")
@@ -97,13 +93,9 @@ public class HourlyWeatherController {
 
         List<HourlyWeather> listHourlyWeather = listDTO2ListEntity(listDTO);
 
-        try {
-            List<HourlyWeather> updateHourlyWeather = hourlyWeatherService.updateByLocationCode(locationCode, listHourlyWeather);
+        List<HourlyWeather> updateHourlyWeather = hourlyWeatherService.updateByLocationCode(locationCode, listHourlyWeather);
 
-            return ResponseEntity.ok(listEntity2DTO(updateHourlyWeather));
-        } catch (LocationNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(listEntity2DTO(updateHourlyWeather));
     }
 
     private HourlyWeatherListDTO listEntity2DTO(List<HourlyWeather> hourlyForecast) {

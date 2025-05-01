@@ -26,7 +26,7 @@ public class HourlyWeatherService {
         Location locationInDB = locationRepository.findByCountryCodeAndCityName(countryCode, cityName);
 
         if (locationInDB == null) {
-            throw new LocationNotFoundException("No location found with the given country code and city name");
+            throw new LocationNotFoundException(countryCode, cityName);
         }
 
         return hourlyWeatherRepository.findByLocationCodeAndHour(locationInDB.getCode(), currentHour);
@@ -37,7 +37,7 @@ public class HourlyWeatherService {
         Location locationInDB = locationRepository.findByCode(locationCode);
 
         if (locationInDB == null) {
-            throw new LocationNotFoundException("No location found with the given code: " + locationCode);
+            throw new LocationNotFoundException(locationCode);
         }
 
         return hourlyWeatherRepository.findByLocationCodeAndHour(locationCode, currentHour);
@@ -47,7 +47,7 @@ public class HourlyWeatherService {
         Location location = locationRepository.findByCode(locationCode);
 
         if (location == null) {
-            throw new LocationNotFoundException("No location found with the given code: " + locationCode);
+            throw new LocationNotFoundException(locationCode);
         }
 
         return Collections.emptyList();

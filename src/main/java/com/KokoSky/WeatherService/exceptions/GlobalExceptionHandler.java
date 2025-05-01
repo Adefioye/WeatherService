@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<ApiError> exceptionHandler(
+    public ResponseEntity<ApiError> handleDuplicateResourceException(
             DuplicateResourceException ex,
             HttpServletRequest request
     ) {
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleException(
+    public ResponseEntity<ApiError> handleMethodArgumentNotvalidException(
             MethodArgumentNotValidException exception,
             HttpServletRequest request
     ) {
@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleException(
+    public ResponseEntity<ApiError> handleResourceNotFoundException(
             ResourceNotFoundException exception,
             HttpServletRequest request
     ) {
@@ -91,7 +91,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(LocationNotFoundException.class)
-    public ResponseEntity<ApiError> handleException(
+    public ResponseEntity<ApiError> handleLocationNotFoundException(
             LocationNotFoundException exception,
             HttpServletRequest request
     ) {
@@ -108,7 +108,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiError> handleException(
+    public ResponseEntity<ApiError> handleBadRequestException(
             BadRequestException exception,
             HttpServletRequest request
     ) {
@@ -125,7 +125,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiError> handleException(
+    public ResponseEntity<ApiError> handleConstraintViolationException(
             ConstraintViolationException exception,
             HttpServletRequest request
     ) {
@@ -140,6 +140,22 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 errors
+        );
+
+        LOGGER.error(exception.getMessage(), exception);
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(GeolocationException.class)
+    public ResponseEntity<ApiError> handleGeolocationException(
+            GeolocationException exception,
+            HttpServletRequest request
+    ) {
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                exception.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
         );
 
         LOGGER.error(exception.getMessage(), exception);

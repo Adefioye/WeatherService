@@ -145,14 +145,14 @@ public class LocationServiceTest {
                 .enabled(enabled)
                 .build();
 
-        when(locationRepository.findUntrashedLocationsByCode(code)).thenReturn(Optional.of(location));
+        when(locationRepository.findByCode(code)).thenReturn((location));
 
         // When
         Location locationByCode = underTest.getLocationByCode(code);
 
         // Then
         assertThat(locationByCode).isNotNull();
-        verify(locationRepository, times(1)).findUntrashedLocationsByCode(code);
+        verify(locationRepository, times(1)).findByCode(code);
     }
 
     @Test
@@ -160,12 +160,12 @@ public class LocationServiceTest {
         // Given
         String code = "LACA_US";
 
-        when(locationRepository.findUntrashedLocationsByCode(code)).thenReturn(Optional.empty());
+        when(locationRepository.findByCode(code)).thenReturn(null);
 
         // When and Then
         assertThatThrownBy(() -> underTest.getLocationByCode(code))
                 .isInstanceOf(LocationNotFoundException.class)
-                .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
+                .hasMessage("No location found with the given code: %s".formatted(code));
     }
 
     @Test
@@ -194,7 +194,7 @@ public class LocationServiceTest {
          // Then
         assertThatThrownBy(() -> underTest.updateLocationByCode(newLocation))
                 .isInstanceOf(LocationNotFoundException.class)
-                .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
+                .hasMessage("No location found with the given code: %s".formatted(code));
     }
 
     @Test
@@ -251,7 +251,7 @@ public class LocationServiceTest {
         // Then
         assertThatThrownBy(() -> underTest.deleteLocationByCode(code))
                 .isInstanceOf(LocationNotFoundException.class)
-                .hasMessage("Sorry! cannot find location with code: %s".formatted(code));
+                .hasMessage("No location found with the given code: %s".formatted(code));
 
         verify(locationRepository, never()).deleteById(code);
     }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -270,8 +271,11 @@ public class HourlyWeatherControllerTest {
 
         mockMvc.perform(put(requestURI).contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", containsString("Temperature must be in the range")))
-                .andExpect(jsonPath("$.errors[1]", containsString("Precipitation must be in the range of 0 to 100 percentage")))
+                .andExpect(jsonPath("$.errors[*]").value(
+                        containsInAnyOrder(
+                                containsString("Temperature must be in the range"),
+                                containsString("Precipitation must be in the range of 0 to 100 percentage")
+                        )))
                 .andDo(print());
     }
 

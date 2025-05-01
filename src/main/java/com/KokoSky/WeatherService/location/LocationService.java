@@ -32,8 +32,14 @@ public class LocationService {
     }
 
     public Location getLocationByCode(String code) {
-        return locationRepository.findUntrashedLocationsByCode(code)
-                .orElseThrow(() -> new LocationNotFoundException("Sorry! cannot find location with code: %s".formatted(code)));
+
+        Location location = locationRepository.findByCode(code);
+
+        if (location == null) {
+            throw new LocationNotFoundException(code);
+        }
+
+        return location;
     }
 
     @Transactional
@@ -41,7 +47,7 @@ public class LocationService {
         String code = newLocation.getCode();
 
         if (!locationRepository.existsLocationByCode(code)) {
-            throw new LocationNotFoundException("Sorry! cannot find location with code: %s".formatted(code));
+            throw new LocationNotFoundException(code);
         }
 
         Location updatedLocation = Location
@@ -60,7 +66,7 @@ public class LocationService {
     @Transactional
     public void deleteLocationByCode(String code) {
         if (!locationRepository.existsLocationByCode(code)) {
-            throw new LocationNotFoundException("Sorry! cannot find location with code: %s".formatted(code));
+            throw new LocationNotFoundException(code);
         }
 
         locationRepository.softDeleteByCode(code);
