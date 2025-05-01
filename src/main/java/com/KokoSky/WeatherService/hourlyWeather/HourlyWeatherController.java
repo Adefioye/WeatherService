@@ -9,6 +9,8 @@ import com.KokoSky.WeatherService.utility.CommonUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,8 @@ public class HourlyWeatherController {
     private final HourlyWeatherService hourlyWeatherService;
     private final GeolocationService locationService;
     private final ModelMapper modelMapper;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HourlyWeatherController.class);
 
     public HourlyWeatherController(
             HourlyWeatherService hourlyWeatherService,
@@ -51,7 +55,7 @@ public class HourlyWeatherController {
 
             return ResponseEntity.ok(listEntity2DTO(hourlyForecast));
         } catch (NumberFormatException e) {
-
+            LOGGER.error(String.format("%s from X-Current-Hour header", e.getMessage()));
             return ResponseEntity.badRequest().build();
         }
     }

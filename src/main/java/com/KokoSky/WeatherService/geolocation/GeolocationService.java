@@ -35,6 +35,9 @@ public class GeolocationService {
         try {
             IPResult result = ipLocator.IPQuery(ipAddress);
 
+            System.out.println("Result: \n");
+            System.out.println(result);
+
             if (!"OK".equals(result.getStatus())) {
                 throw new GeolocationException("Geolocation failed with status: " + result.getStatus());
             }
