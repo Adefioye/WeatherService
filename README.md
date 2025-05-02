@@ -6,7 +6,8 @@
 - Implemented soft delete for location data by setting `trashed` field to `true`
 
 #### Work yet to be done
-- [ ] Add CI/CD using Github actions to build the program and run unit and integration tests on push to main
+- [ ] Add CI/CD using Github actions to build the program and run unit and integration tests on push to main.
+- [ ] PUT `api/v1/hourly/locationCode` still not fully implemented. [Service layer]
 
 ## Essential docker commands used in project
 - `docker-compose up -d` to start the postgresSQL container
