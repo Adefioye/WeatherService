@@ -1,7 +1,6 @@
 package com.KokoSky.WeatherService.hourlyWeather;
 
 import com.KokoSky.WeatherService.exceptions.BadRequestException;
-import com.KokoSky.WeatherService.exceptions.GeolocationException;
 import com.KokoSky.WeatherService.exceptions.LocationNotFoundException;
 import com.KokoSky.WeatherService.geolocation.GeolocationService;
 import com.KokoSky.WeatherService.location.Location;

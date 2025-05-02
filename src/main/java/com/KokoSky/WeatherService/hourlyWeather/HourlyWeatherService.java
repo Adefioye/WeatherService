@@ -5,6 +5,7 @@ import com.KokoSky.WeatherService.location.Location;
 import com.KokoSky.WeatherService.location.LocationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,13 +44,27 @@ public class HourlyWeatherService {
         return hourlyWeatherRepository.findByLocationCodeAndHour(locationCode, currentHour);
     }
 
-    public List<HourlyWeather> updateByLocationCode(String locationCode, List<HourlyWeather> hourlyForecastInRequest) {
+    public List<HourlyWeather> updateByLocationCode(String locationCode, List<HourlyWeather> hourlyWeatherInRequest) {
         Location location = locationRepository.findByCode(locationCode);
 
-        if (location == null) {
-            throw new LocationNotFoundException(locationCode);
+        for (HourlyWeather item : hourlyWeatherInRequest) {
+            item.getId().setLocation(location);
         }
 
-        return Collections.emptyList();
+        List<HourlyWeather> hourlyWeatherInDB = location.getListHourlyWeather();
+        List<HourlyWeather> hourlyWeatherToBeRemoved = new ArrayList<>();
+
+        // Here we remove all item in DB currently not in hourlyWeatherRequest
+        for (HourlyWeather item : hourlyWeatherInDB) {
+            if (!hourlyWeatherInRequest.contains(item)) {
+                hourlyWeatherToBeRemoved.add(item.getShallowCopy());
+            }
+        }
+
+        for (HourlyWeather item : hourlyWeatherToBeRemoved) {
+            hourlyWeatherInDB.remove(item);
+        }
+
+        return (List<HourlyWeather>) hourlyWeatherRepository.saveAll(hourlyWeatherInRequest);
     }
 }
