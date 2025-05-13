@@ -1,5 +1,7 @@
 package com.KokoSky.WeatherService;
 
+import com.KokoSky.WeatherService.dailyWeather.DailyWeather;
+import com.KokoSky.WeatherService.dailyWeather.DailyWeatherDTO;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeather;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeatherDTO;
 import org.modelmapper.ModelMapper;
@@ -22,6 +24,11 @@ public class Main {
 		var typeMap2 = mapper.typeMap(HourlyWeatherDTO.class, HourlyWeather.class);
 		typeMap2.addMapping(HourlyWeatherDTO::getHourOfDay,
 				(dest, value) ->	dest.getId().setHourOfDay(value != null ? (int) value : 0));
+
+		var typeMap3 = mapper.typeMap(DailyWeather.class, DailyWeatherDTO.class);
+		typeMap3.addMapping(src -> src.getId().getDayOfMonth(), DailyWeatherDTO::setDayOfMonth);
+		typeMap3.addMapping(src -> src.getId().getMonth(), DailyWeatherDTO::setMonth);
+
 		return mapper;
 	}
 
