@@ -3,6 +3,7 @@
 -- Drop tables if they exist (in reverse order to avoid constraint violations)
 DROP TABLE IF EXISTS weather_hourly;
 DROP TABLE IF EXISTS realtime_weather;
+DROP TABLE IF EXISTS weather_daily;
 DROP TABLE IF EXISTS locations;
 
 -- Create the locations table

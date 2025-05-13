@@ -1,5 +1,7 @@
 package com.KokoSky.WeatherService.location;
 
+import com.KokoSky.WeatherService.dailyWeather.DailyWeather;
+import com.KokoSky.WeatherService.dailyWeather.DailyWeatherId;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeather;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeatherId;
 import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeather;
@@ -362,6 +364,67 @@ public class LocationRepositoryTest {
 
         Location thirdActual = underTest.findByCountryCodeAndCityName(missingCountryCode, missingCityName);
         assertThat(thirdActual).isNull();
+    }
+
+    @Test
+    public void testAddDailyWeatherData() {
+        // When
+        String code = "LACA_US";
+        String cityName = "Los Angeles";
+        String regionName = "California";
+        String countryName = "United States Of America";
+        String countryCode = "US";
+        boolean enabled = true;
+        boolean trashed = false;
+
+        Location location = Location
+                .builder()
+                .code(code)
+                .cityName(cityName)
+                .regionName(regionName)
+                .countryName(countryName)
+                .countryCode(countryCode)
+                .enabled(enabled)
+                .trashed(trashed)
+                .build();
+
+        // When
+        underTest.save(location);
+
+        // Fetch existing location
+        Optional<Location> fetchedLocation = underTest.findById(code);
+
+        assertThat(fetchedLocation).isPresent();
+
+        // Create DailyWeather instances with embedded ID
+        DailyWeatherId id1 = new DailyWeatherId(16, 7, location);
+        DailyWeather forecast1 = DailyWeather.builder()
+                .id(id1)
+                .minTemp(25)
+                .maxTemp(33)
+                .precipitation(20)
+                .status("Sunny")
+                .build();
+
+        DailyWeatherId id2 = new DailyWeatherId(17, 7, location);
+        DailyWeather forecast2 = DailyWeather.builder()
+                .id(id2)
+                .minTemp(26)
+                .maxTemp(34)
+                .precipitation(10)
+                .status("Clear")
+                .build();
+
+        // Add to location's list
+        location.getListDailyWeather().add(forecast1);
+        location.getListDailyWeather().add(forecast2);
+
+        // Save the parent entity (due to CascadeType.ALL, children will be saved too)
+        Location updatedLocation = underTest.save(location);
+
+        // Assert
+        assertThat(updatedLocation.getListDailyWeather()).isNotEmpty();
+        assertThat(updatedLocation.getListDailyWeather()).hasSizeGreaterThanOrEqualTo(2);
     }
 
 }

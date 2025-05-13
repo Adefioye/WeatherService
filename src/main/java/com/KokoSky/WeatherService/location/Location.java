@@ -52,7 +52,7 @@ public class Location {
     @Builder.Default
     private List<HourlyWeather> listHourlyWeather = new ArrayList<>();
 
-    @OneToMany(mappedBy = "id.location")
+    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL)
     @Builder.Default
     private List<DailyWeather> listDailyWeather = new ArrayList<>();
 
