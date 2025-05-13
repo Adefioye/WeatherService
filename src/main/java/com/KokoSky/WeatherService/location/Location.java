@@ -1,5 +1,6 @@
 package com.KokoSky.WeatherService.location;
 
+import com.KokoSky.WeatherService.dailyWeather.DailyWeather;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeather;
 import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeather;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -50,6 +51,10 @@ public class Location {
     @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL)
     @Builder.Default
     private List<HourlyWeather> listHourlyWeather = new ArrayList<>();
+
+    @OneToMany(mappedBy = "id.location")
+    @Builder.Default
+    private List<DailyWeather> listDailyWeather = new ArrayList<>();
 
     public Location(String cityName, String regionName, String countryName, String countryCode) {
         this.cityName = cityName;
