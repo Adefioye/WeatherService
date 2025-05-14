@@ -119,4 +119,75 @@ public class DailyWeatherControllerTest {
                 .andExpect(jsonPath("$.daily_forecast[1].status", is("Sunny")))
                 .andDo(print());
     }
+
+    @Test
+    public void testGetByCodeShouldReturn404NotFound() throws Exception {
+        String locationCode = "LACA_US";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        LocationNotFoundException ex = new LocationNotFoundException(locationCode);
+        when(dailyWeatherService.getByLocationCode(locationCode)).thenThrow(ex);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(ex.getMessage())))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByCodeShouldReturn204NoContent() throws Exception {
+        String locationCode = "LACA_US";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        when(dailyWeatherService.getByLocationCode(locationCode)).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByCodeShouldReturn200OK() throws  Exception {
+        String requestURI = END_POINT_PATH + "/" + "NYC_USA";
+        // Arrange – Create Location
+        Location location = Location.builder()
+                .code("NYC_USA")
+                .cityName("New York City")
+                .regionName("New York")
+                .countryCode("US")
+                .countryName("United States of America")
+                .build();
+
+        // Create DailyWeatherId instances
+        DailyWeatherId id1 = new DailyWeatherId(16, 7, location);
+        DailyWeatherId id2 = new DailyWeatherId(17, 7, location);
+
+        // Create DailyWeather entries with ID
+        DailyWeather forecast1 = DailyWeather.builder()
+                .id(id1)
+                .minTemp(23)
+                .maxTemp(32)
+                .precipitation(40)
+                .status("Cloudy")
+                .build();
+
+        DailyWeather forecast2 = DailyWeather.builder()
+                .id(id2)
+                .minTemp(25)
+                .maxTemp(34)
+                .precipitation(30)
+                .status("Sunny")
+                .build();
+
+        when(dailyWeatherService.getByLocationCode("NYC_USA")).thenReturn(List.of(forecast1, forecast2));
+
+        String expectedLocation = location.toString();
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.location", is(expectedLocation)))
+                .andExpect(jsonPath("$.daily_forecast[0].day_of_month", is(16)))
+                .andDo(print());
+    }
 }

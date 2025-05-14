@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,6 +36,17 @@ public class DailyWeatherController {
 
         Location locationFromIP = geolocationService.getLocation(ipAddress);
         List<DailyWeather> dailyForecast = dailyWeatherService.getByLocation(locationFromIP);
+
+        if (dailyForecast.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(listEntity2DTO(dailyForecast));
+    }
+
+    @GetMapping("{locationCode}")
+    public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode){
+        List<DailyWeather> dailyForecast = dailyWeatherService.getByLocationCode(locationCode);
 
         if (dailyForecast.isEmpty()) {
             return ResponseEntity.noContent().build();
