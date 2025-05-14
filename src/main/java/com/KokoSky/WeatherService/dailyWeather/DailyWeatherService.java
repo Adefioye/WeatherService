@@ -5,6 +5,7 @@ import com.KokoSky.WeatherService.location.Location;
 import com.KokoSky.WeatherService.location.LocationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,5 +42,35 @@ public class DailyWeatherService {
         }
 
         return dailyWeatherRepository.findByLocationCode(locationCode);
+    }
+
+    public List<DailyWeather> updateByLocationCode(
+            String code,
+            List<DailyWeather> dailyWeatherInRequest) throws LocationNotFoundException {
+
+        Location location = locationRepository.findByCode(code);
+
+        if (location == null) {
+            throw new LocationNotFoundException(code);
+        }
+
+        for (DailyWeather data : dailyWeatherInRequest) {
+            data.getId().setLocation(location);
+        }
+
+        List<DailyWeather> dailyWeatherInDB = location.getListDailyWeather();
+        List<DailyWeather> dailyWeatherToBeRemoved = new ArrayList<>();
+
+        for (DailyWeather forecast : dailyWeatherInDB) {
+            if (!dailyWeatherInRequest.contains(forecast)) {
+                dailyWeatherToBeRemoved.add(forecast.getShallowCopy());
+            }
+        }
+
+        for (DailyWeather forecastToBeRemoved : dailyWeatherToBeRemoved) {
+            dailyWeatherInDB.remove(forecastToBeRemoved);
+        }
+
+        return (List<DailyWeather>) dailyWeatherRepository.saveAll(dailyWeatherInRequest);
     }
 }
