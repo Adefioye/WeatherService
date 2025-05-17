@@ -1,7 +1,5 @@
 package com.KokoSky.WeatherService.realtimeWeather;
 
-import com.KokoSky.WeatherService.exceptions.GeolocationException;
-import com.KokoSky.WeatherService.exceptions.LocationNotFoundException;
 import com.KokoSky.WeatherService.geolocation.GeolocationService;
 import com.KokoSky.WeatherService.location.Location;
 import com.KokoSky.WeatherService.utility.CommonUtility;
@@ -52,16 +50,21 @@ public class RealtimeWeatherController {
 
     @PutMapping("/{locationCode}")
     public ResponseEntity<?> updateRealtimeWeather(@PathVariable("locationCode") String locationCode,
-                                                   @RequestBody @Valid RealtimeWeather realtimeWeatherRequest) {
+                                                   @RequestBody @Valid RealtimeWeatherDTO dto) {
 
-        realtimeWeatherRequest.setLocationCode(locationCode);
+        RealtimeWeather realtimeWeather = dto2Entity(dto);
+        realtimeWeather.setLocationCode(locationCode);
 
-        RealtimeWeather updatedRealtimeWeather = realtimeWeatherService.update(locationCode, realtimeWeatherRequest);
+        RealtimeWeather updatedRealtimeWeather = realtimeWeatherService.update(locationCode, realtimeWeather);
 
         return ResponseEntity.ok(entity2DTO(updatedRealtimeWeather));
     }
 
     private RealtimeWeatherDTO entity2DTO(RealtimeWeather realtimeWeather) {
         return modelMapper.map(realtimeWeather, RealtimeWeatherDTO.class);
+    }
+
+    private RealtimeWeather dto2Entity(RealtimeWeatherDTO dto) {
+        return modelMapper.map(dto, RealtimeWeather.class);
     }
 }

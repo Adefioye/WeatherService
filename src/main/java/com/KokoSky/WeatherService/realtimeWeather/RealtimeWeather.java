@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
 import java.util.Objects;
@@ -28,17 +27,12 @@ public class RealtimeWeather {
     @JsonIgnore
     private String locationCode;
 
-    @Range(min = -50, max = 50, message = "Temperature must be in the range of -50 to 50 Celsius degree")
     private int temperature;
 
-    @Range(min = 0, max = 100, message = "Humidity must be in the range of 0 to 100 percentage")
     private int humidity;
 
-    @Range(min = 0, max = 100, message = "Precipitation must be in the range of 0 to 100 percentage")
     private int precipitation;
 
-    @JsonProperty("wind_speed")
-    @Range(min = 0, max = 200, message = "Wind speed must be in the range of 0 to 200 km/h")
     private int windSpeed;
 
     @Column(length = 50)
@@ -47,13 +41,11 @@ public class RealtimeWeather {
     private String status;
 
     @JsonProperty("last_updated")
-    @JsonIgnore
     private Date lastUpdated;
 
     @OneToOne
     @JoinColumn(name = "location_code")
     @MapsId
-    @JsonIgnore
     private Location location;
 
     public void setLocation(Location location) {

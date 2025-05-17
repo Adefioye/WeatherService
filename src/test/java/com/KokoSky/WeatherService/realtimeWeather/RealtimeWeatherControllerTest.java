@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -197,12 +197,11 @@ public class RealtimeWeatherControllerTest {
 
     @Test
     public void testUpdateRealtimeWeatherByLocationCode_returnNotFound_with404StatusCode() throws Exception {
-        String locationCode = "ABC_US";
+        String locationCode = "LACA_US";
         String requestURI = END_POINT_PATH + "/" + locationCode;
 
-        RealtimeWeather realtimeWeather = RealtimeWeather
+        RealtimeWeatherDTO dto = RealtimeWeatherDTO
                 .builder()
-                .locationCode(locationCode)
                 .temperature(12)
                 .humidity(32)
                 .precipitation(88)
@@ -211,9 +210,9 @@ public class RealtimeWeatherControllerTest {
                 .lastUpdated(new Date())
                 .build();
 
-        String bodyContent = objectMapper.writeValueAsString(realtimeWeather);
+        String bodyContent = objectMapper.writeValueAsString(dto);
 
-        when(realtimeWeatherService.update(locationCode, realtimeWeather)).thenThrow(LocationNotFoundException.class);
+        when(realtimeWeatherService.update(eq(locationCode), any(RealtimeWeather.class))).thenThrow(LocationNotFoundException.class);
 
         mockMvc.perform(put(requestURI).contentType("application/json").content(bodyContent))
                 .andExpect(status().isNotFound())
@@ -254,13 +253,25 @@ public class RealtimeWeatherControllerTest {
                 .lastUpdated(new Date())
                 .build();
 
+        RealtimeWeatherDTO dto = RealtimeWeatherDTO
+                .builder()
+                .location(location.toString())
+                .temperature(12)
+                .humidity(32)
+                .precipitation(88)
+                .windSpeed(57)
+                .status("Snowy")
+                .lastUpdated(new Date())
+                .build();
+
+
         // Set location on realtimeWeather
         location.setRealtimeWeather(realtimeWeather);
         realtimeWeather.setLocation(location);
 
-        when(realtimeWeatherService.update(locationCode, realtimeWeather)).thenReturn(realtimeWeather);
+        when(realtimeWeatherService.update(anyString(), any())).thenReturn(realtimeWeather);
 
-        String bodyContent = objectMapper.writeValueAsString(realtimeWeather);
+        String bodyContent = objectMapper.writeValueAsString(dto);
 
         String expectedLocation = location.getCityName() + ", " + location.getRegionName() + ", " + location.getCountryName();
         String requestURI = END_POINT_PATH + "/" + locationCode;
