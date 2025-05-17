@@ -3,6 +3,7 @@ package com.KokoSky.WeatherService.fullWeather;
 import com.KokoSky.WeatherService.dailyWeather.DailyWeatherDTO;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeatherDTO;
 import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeatherDTO;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class FullWeatherDTO {
     private String location;
 
     @JsonProperty("realtime_weather")
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RealtimeWeatherFieldFilter.class)
     @Builder.Default
     private RealtimeWeatherDTO realtimeWeather = new RealtimeWeatherDTO();
 
