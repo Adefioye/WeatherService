@@ -2,8 +2,10 @@ package com.KokoSky.WeatherService;
 
 import com.KokoSky.WeatherService.dailyWeather.DailyWeather;
 import com.KokoSky.WeatherService.dailyWeather.DailyWeatherDTO;
+import com.KokoSky.WeatherService.fullWeather.FullWeatherDTO;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeather;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeatherDTO;
+import com.KokoSky.WeatherService.location.Location;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -34,6 +36,9 @@ public class Main {
 				(dest, value) -> dest.getId().setDayOfMonth(value != null ? (int) value : 0));
 		typeMap4.addMapping(src -> src.getMonth(),
 				(dest, value) -> dest.getId().setMonth(value != null ? (int) value : 0));
+
+		var typeMap5 = mapper.typeMap(Location.class, FullWeatherDTO.class);
+		typeMap5.addMapping(src -> src.toString(), FullWeatherDTO::setLocation);
 
 		return mapper;
 	}

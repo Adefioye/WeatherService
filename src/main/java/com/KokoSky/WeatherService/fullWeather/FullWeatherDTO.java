@@ -1,0 +1,34 @@
+package com.KokoSky.WeatherService.fullWeather;
+
+import com.KokoSky.WeatherService.dailyWeather.DailyWeatherDTO;
+import com.KokoSky.WeatherService.hourlyWeather.HourlyWeatherDTO;
+import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeatherDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class FullWeatherDTO {
+
+    private String location;
+
+    @JsonProperty("realtime_weather")
+    @Builder.Default
+    private RealtimeWeatherDTO realtimeWeather = new RealtimeWeatherDTO();
+
+    @JsonProperty("hourly_forecast")
+    @Builder.Default
+    private List<HourlyWeatherDTO> listHourlyWeather = new ArrayList<>();
+
+    @JsonProperty("daily_forecast")
+    @Builder.Default
+    private List<DailyWeatherDTO> listDailyWeather = new ArrayList<>();
+}
