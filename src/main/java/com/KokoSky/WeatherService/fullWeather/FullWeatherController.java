@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,6 +34,14 @@ public class FullWeatherController {
 
         Location locationFromIP = geolocationService.getLocation(ipAddress);
         Location locationInDB = fullWeatherService.getByLocation(locationFromIP);
+
+        return ResponseEntity.ok(entity2DTO(locationInDB));
+    }
+
+    @GetMapping("/{locationCode}")
+    public ResponseEntity<?> getFullWeatherByLocationCode(@PathVariable String locationCode) {
+
+        Location locationInDB = fullWeatherService.get(locationCode);
 
         return ResponseEntity.ok(entity2DTO(locationInDB));
     }
