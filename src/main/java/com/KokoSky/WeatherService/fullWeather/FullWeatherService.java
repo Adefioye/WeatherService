@@ -8,6 +8,7 @@ import com.KokoSky.WeatherService.location.LocationRepository;
 import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeather;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -52,6 +53,12 @@ public class FullWeatherService {
         // Update associations to point to locationInDB
         RealtimeWeather realtimeWeather = locationInRequest.getRealtimeWeather();
         realtimeWeather.setLocation(locationInDB);
+        realtimeWeather.setLastUpdated(new Date());
+
+        if (locationInDB.getRealtimeWeather() == null) {
+            locationInDB.setRealtimeWeather(realtimeWeather);
+            locationRepository.save(locationInDB);
+        }
 
         List<DailyWeather> listDailyWeather = locationInRequest.getListDailyWeather();
         listDailyWeather.forEach(dw -> dw.getId().setLocation(locationInDB));
