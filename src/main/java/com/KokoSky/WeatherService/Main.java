@@ -6,6 +6,8 @@ import com.KokoSky.WeatherService.fullWeather.FullWeatherDTO;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeather;
 import com.KokoSky.WeatherService.hourlyWeather.HourlyWeatherDTO;
 import com.KokoSky.WeatherService.location.Location;
+import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeather;
+import com.KokoSky.WeatherService.realtimeWeather.RealtimeWeatherDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -39,6 +41,9 @@ public class Main {
 
 		var typeMap5 = mapper.typeMap(Location.class, FullWeatherDTO.class);
 		typeMap5.addMapping(src -> src.toString(), FullWeatherDTO::setLocation);
+
+		var typeMap6 = mapper.typeMap(RealtimeWeatherDTO.class, RealtimeWeather.class);
+		typeMap6.addMappings(m -> m.skip(RealtimeWeather::setLocation));
 
 		return mapper;
 	}
